@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android Camera Demo</string>
+    
+    <!-- Launch Activity -->
+    <string name="launch_button_label">Launch the camera</string>
+    <string name="ok_label">OK</string>
+    <string name="error_label">Error!</string>
+    
+</resources>
