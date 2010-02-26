@@ -30,7 +30,7 @@ You can touch the screen or press the trackboll button to get an image from came
             } else {
                 showAlertDialog("Android Camera Demo", "No image taken!");
             }
-
+            setImageTaken(imageUri);
         }
     }
 
