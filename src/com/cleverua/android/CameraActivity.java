@@ -95,37 +95,6 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback {
         super.onStop();
     };	
 
-    Camera.PictureCallback mPictureCallbackRaw = new Camera.PictureCallback() {
-        public void onPictureTaken(byte[] data, Camera camera) {
-            Log.d(TAG, "Picture taken, data = " + data);
-            Log.d(TAG, "Prepare to start camera preview");
-            camera.startPreview();
-
-        }
-    };
-
-    Camera.PictureCallback mPictureCallbackJpeg = new Camera.PictureCallback() {
-        public void onPictureTaken(byte[] data, Camera camera) {
-            Log.d(TAG, "onPictureTaken()");
-            try {
-                Log.d(TAG, "prepare to open fileOutputStream");
-                OutputStream fileOutputStream = getContentResolver().openOutputStream(pictureUri);
-                Log.d(TAG, "prepare to write data");
-                fileOutputStream.write(data);
-                Log.d(TAG, "prepare to flush stream");
-                fileOutputStream.flush();
-                Log.d(TAG, "prepare to close stream");
-                fileOutputStream.close();
-
-                saveResult(RESULT_OK);
-
-            } catch (Exception e) {
-                Log.e(TAG, "mPictureCallbackJpeg exception caught: " + e);
-            } 
-        }
-    };
-
-
     public void surfaceChanged(SurfaceHolder holder, int format, int width,
             int height) {
         Log.d(TAG, "surfaceChanged()");
@@ -170,16 +139,9 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback {
     private void takePicture() {
         Log.d(TAG, "takePicture()");
         try {
-            String fileName = timeStampFormat.format(new Date());
-            Log.d(TAG, "prepared file name: " + fileName);
-            ContentValues values = new ContentValues();
-            values.put(MediaColumns.TITLE, fileName);
-            values.put(ImageColumns.DESCRIPTION, "Android Camera Image");
-            Log.d(TAG, "prepared values");
-            pictureUri = getContentResolver().insert(targetResource, values);			
+            pictureUri = prepareImageFile(timeStampFormat.format(new Date()), "Android Camera Image");			
             Log.d(TAG, "picture uri: " + pictureUri.getPath());
             camera.takePicture(mShutterCallback, mPictureCallbackRaw, mPictureCallbackJpeg);
-//            throw new Exception("Test exception!");
         } catch (Exception ex) {
             Log.e(TAG, "takePicture() exception caught: " + ex);
             saveResult(RESULT_CANCELED);
@@ -203,10 +165,50 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback {
         finish();
     }
 
+    private Uri prepareImageFile(String imageFileName, String imageDescription) {
+        Log.d(TAG, "prepared file name: " + imageFileName);
+        ContentValues values = new ContentValues();
+        values.put(MediaColumns.TITLE, imageFileName);
+        if (imageDescription != null) {
+            values.put(ImageColumns.DESCRIPTION, "Android Camera Image");
+        }
+        Log.d(TAG, "prepared values");
+        return getContentResolver().insert(targetResource, values);
+    }
+    
     Camera.ShutterCallback mShutterCallback = new Camera.ShutterCallback() {
         public void onShutter() {
             Log.d(TAG, "mShutterCallback");
         }
     };
+    
+    Camera.PictureCallback mPictureCallbackRaw = new Camera.PictureCallback() {
+        public void onPictureTaken(byte[] data, Camera camera) {
+            Log.d(TAG, "Picture taken, data = " + data);
+            Log.d(TAG, "Prepare to start camera preview");
+            camera.startPreview();
 
+        }
+    };
+
+    Camera.PictureCallback mPictureCallbackJpeg = new Camera.PictureCallback() {
+        public void onPictureTaken(byte[] data, Camera camera) {
+            Log.d(TAG, "onPictureTaken()");
+            try {
+                Log.d(TAG, "prepare to open fileOutputStream");
+                OutputStream fileOutputStream = getContentResolver().openOutputStream(pictureUri);
+                Log.d(TAG, "prepare to write data");
+                fileOutputStream.write(data);
+                Log.d(TAG, "prepare to flush stream");
+                fileOutputStream.flush();
+                Log.d(TAG, "prepare to close stream");
+                fileOutputStream.close();
+
+                saveResult(RESULT_OK);
+
+            } catch (Exception e) {
+                Log.e(TAG, "mPictureCallbackJpeg exception caught: " + e);
+            } 
+        }
+    };
 }

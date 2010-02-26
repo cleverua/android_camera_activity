@@ -1,0 +1,42 @@
+== DESCRIPTION
+
+This sample Android application demonstrates an approach for Camera usage.
+
+== USAGE
+
+=== Add camera permission to your AndroidManifest.xml file
+  
+  <uses-permission android:name="android.permission.CAMERA"/>
+
+=== Start camera activity in the next way:
+
+  private static final int PICK_PICTURE_CAMERA_REQUEST = 1;
+
+  ...
+
+  Intent i = new Intent(this, CameraActivity.class);
+  startActivityForResult(i, PICK_PICTURE_CAMERA_REQUEST);
+
+You can touch the screen or press the trackboll button to get an image from camera.
+
+=== To get the camera result image Uri use onActivityResult(int requestCode, int resultCode, Intent data) method:
+
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_PICTURE_CAMERA_REQUEST) {
+            Uri imageUri = null;
+            if (resultCode == RESULT_OK) {
+                imageUri = data.getData();
+            } else {
+                showAlertDialog("Android Camera Demo", "No image taken!");
+            }
+
+        }
+    }
+
+If an Exception occured in the camera activity the resultCode will be RESULT_CANCELED and no data attached.
+
+== EXAMPLES
+
+To see an example please launch the Android Camera Demo application in Android device emulator.
+
